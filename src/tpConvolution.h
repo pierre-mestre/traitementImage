@@ -1,6 +1,4 @@
-
 #pragma once
-
 #include <opencv2/opencv.hpp>
 
 cv::Mat meanFilter(cv::Mat image, int size);

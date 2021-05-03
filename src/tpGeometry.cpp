@@ -12,12 +12,16 @@ using namespace std;
 */
 Mat transpose(Mat image)
 {
-    Mat res = Mat::zeros(1,1,CV_32FC1);
+    Mat res = Mat::zeros(image.cols, image.rows, CV_32FC1);
     /********************************************
                 YOUR CODE HERE
     hint: consider a non square image
     *********************************************/
-   
+    for(int i = 0; i < res.rows; ++i) {
+        for (int j = 0; j < res.cols; ++j) {
+            res.at<int>(i, j) = image.at<int>(j, i);
+        }
+    }
     /********************************************
                 END OF YOUR CODE
     *********************************************/
@@ -34,12 +38,11 @@ float interpolate_nearest(Mat image, float y, float x)
     /********************************************
                 YOUR CODE HERE
     *********************************************/
-    
+    v = image.at<float>((int)floor(x+0.5),(int)floor(y+0.5));
     /********************************************
                 END OF YOUR CODE
     *********************************************/
     return v;
-
 }
 
 
@@ -52,7 +55,17 @@ float interpolate_bilinear(Mat image, float y, float x)
     /********************************************
                 YOUR CODE HERE
     *********************************************/
-    
+    int xi = floor(x);
+    int yi = floor(y);
+
+    float n1 = image.at<float>(xi+1,yi+1);
+    float n2 = image.at<float>(xi,yi+1);
+    float n3 = image.at<float>(xi+1,yi);
+    float n4 = image.at<float>(xi,yi);
+
+    float a = (float)(x-xi)/(float)((xi+1)-xi);
+    float b = (float)(y-yi)/(float)((yi+1)-yi);
+    v = (float)((float)a*b*n1 + (float)(1-a)*b*n2 + (float)a*(1-b)*n3 + (float)(1-a)*(1-b)*n4);
     /********************************************
                 END OF YOUR CODE
     *********************************************/
@@ -67,10 +80,18 @@ Mat expand(Mat image, int factor, float(* interpolationFunction)(cv::Mat image, 
 {
     assert(factor>0);
     Mat res = Mat::zeros((image.rows-1)*factor,(image.cols-1)*factor,CV_32FC1);
+
     /********************************************
                 YOUR CODE HERE
     *********************************************/
-    
+    int rows = image.rows-1;
+    int cols = image.cols-1;
+
+    for(int i = 0; i < rows*factor; ++i){
+        for (int j = 0; j < cols*factor; ++j){
+            res.at<float>(i,j) =  interpolationFunction(image,(float)j/factor,(float)i/factor);
+        }
+    }
     /********************************************
                 END OF YOUR CODE
     *********************************************/
